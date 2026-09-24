@@ -1,0 +1,22 @@
+schema_version = "1.0.0"
+
+id = "architectural_assembly"
+version = "0.1.0"
+name = "Architectural Assembly"
+tagline = "Architectural solidify with click-to-paint surfaces"
+maintainer = "Yohann Joachim Zapata"
+type = "add-on"
+website = "https://github.com/yohannzapata/architectural-assembly"
+
+tags = ["Modeling", "Mesh", "Material"]
+
+blender_version_min = "4.2.0"
+
+license = ["SPDX:GPL-3.0-or-later"]
+copyright = ["2026 Yohann Joachim Zapata"]
+
+[build]
+paths_exclude_pattern = [
+  "__pycache__/",
+  "*.pyc",
+]
