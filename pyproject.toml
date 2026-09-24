@@ -1,0 +1,24 @@
+# Development tooling only. The add-on itself is packaged by Blender from
+# architectural_assembly/blender_manifest.toml.
+
+[project]
+name = "architectural-assembly"
+version = "0.1.0"
+description = "Architectural solidify with click-to-paint surfaces for Blender"
+readme = "README.md"
+license = "GPL-3.0-or-later"
+authors = [{ name = "Yohann Joachim Zapata" }]
+requires-python = ">=3.11"
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+extend-exclude = ["dist"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+# zip() over mesh arrays pairs lists that are equal-length by construction.
+ignore = ["B905"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["architectural_assembly", "helpers"]
