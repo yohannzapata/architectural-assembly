@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2026 Yohann Joachim Zapata
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Click-to-paint tool for assemblies (Bloxburg-style).
+"""Click-to-paint tool for assemblies.
 
     LMB           paint the surface under the cursor
     Shift + LMB   fill: paint every connected surface of the same kind

@@ -9,8 +9,8 @@
 
 You model the shape: walls, gables, floors, fences, openings, anything
 built from faces. Architectural Assembly gives it real thickness, with clean
-corners, T-junctions and crossings. Then you paint it the way you would in a
-building game: pick a material and click a surface.
+corners, T-junctions and crossings. Then you paint it directly in the
+viewport: pick a material and click a surface.
 
 ![A house modelled from plain faces, thickened and painted](docs/images/preview.png)
 
@@ -33,7 +33,7 @@ building game: pick a material and click a surface.
   proper jambs, sill and lintel.
 - **Per-face thickness.** Give selected faces their own thickness, for
   example a thicker exterior wall.
-- **Bloxburg-style painting.**
+- **Click-to-paint surfaces.**
   - **Click** paints one surface (one side of a wall, a sill, a top).
   - **Shift-click** fills every connected surface of the same kind: the whole
     inside of a room in one click, without leaking outside.
@@ -94,7 +94,7 @@ modifier shows it on your object. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.m
 - [ ] Door and window components that cut openings and follow the wall
       (`core.anchors` is the placement foundation)
 - [ ] Trims: baseboards, crown moulding, window frames
-- [ ] Material + colour painting (tint any material, as in Bloxburg)
+- [ ] Material + colour painting (tint any material with a chosen colour)
 - [ ] Paint presets and a shared paint library
 - [ ] Floor and roof helpers built on the same engine
 - [ ] Faster regeneration for very large meshes

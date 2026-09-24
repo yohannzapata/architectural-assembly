@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2026 Yohann Joachim Zapata
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Architectural Assembly: architectural solidify and Bloxburg-style painting for Blender.
+"""Architectural Assembly: architectural solidify and click-to-paint surfaces for Blender.
 
 Packages:
     core      pure-Python geometry (no bpy): sheet -> thick shell

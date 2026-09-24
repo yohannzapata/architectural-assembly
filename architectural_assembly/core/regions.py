@@ -6,7 +6,7 @@ The unit of paint is a *surface*, never a single polygon: one surface
 (front, back, top, bottom or edge) of one source face. A click on any
 polygon of it paints all of it.
 
-Flood fill (Bloxburg's "paint the whole room") spreads across edges to
+Flood fill ("paint the whole room") spreads across edges to
 neighbouring polygons with the same surface type and orientation (walls
 stay walls, floors stay floors). Rims separate the two sides of a sheet,
 so filling the inside of a room never leaks outside.

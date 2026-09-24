@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2026 Yohann Joachim Zapata
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Bloxburg-style surface painting.
+"""Click-to-paint surface painting.
 
     palette  scene-wide paint materials (Scene.aa_paint)
     tool     modal click-to-paint operator with hover highlight

@@ -15,7 +15,7 @@ All notable changes to this project are documented here. The format follows
 - *Architectural Assembly* Geometry Nodes modifier with Thickness, Offset and
   Miter Limit; live update in Edit Mode; apply or remove like any modifier.
 - Per-face thickness overrides.
-- Bloxburg-style paint tool: click, Shift-click fill, Ctrl-click erase,
+- Click-to-paint tool: click, Shift-click fill, Ctrl-click erase,
   Alt-click pick, hover highlight, scene-wide palette with starter paints.
 - Surface tags (`aa_surface`, `aa_source_face`, `aa_uid`) on the generated
   mesh for other tools.
