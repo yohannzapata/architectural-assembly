@@ -7,14 +7,16 @@
     display     the "Architectural Assembly" Geometry Nodes modifier
     sync        regenerates shells when sources change (depsgraph handler)
     operators   add/remove, rebuild, per-face thickness, clear paint
+    windows     window objects: add, slide along walls, divide into panes
+    window_io   reads windows into core.WindowSpec
     ui          sidebar panel (View3D > Sidebar > Assembly)
 """
 
 import bpy
 
-from . import operators, properties, sync, ui
+from . import operators, properties, sync, ui, windows
 
-_modules = (properties, operators, ui, sync)
+_modules = (properties, operators, windows, ui, sync)
 
 
 def _initial_sync():

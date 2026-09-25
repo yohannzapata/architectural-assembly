@@ -19,5 +19,10 @@ All notable changes to this project are documented here. The format follows
   Alt-click pick, hover highlight, scene-wide palette with starter paints.
 - Surface tags (`aa_surface`, `aa_source_face`, `aa_uid`) on the generated
   mesh for other tools.
+- Windows: a sheet of pane faces that cuts the wall it lies on and generates
+  frame, mullions and glass. Add and slide them on walls in the viewport (G),
+  resize by scaling or editing the faces, divide into columns, rows and top
+  lights. Panes can be any convex shape; the opening, frame and glass follow.
+  Live in Edit Mode.
 - Surface anchors (`core.anchors`) as the foundation for doors, windows and
   attachments.

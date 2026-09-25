@@ -31,6 +31,14 @@ viewport: pick a material and click a surface.
   split for a door meeting a wall split for a window).
 - **Openings for free.** Delete faces to make a door or window. The hole gets
   proper jambs, sill and lintel.
+- **Windows you can just click, move and scale.** **Sidebar → Assembly →
+  Windows → Add Window**, then click a wall to drop it. A window is its own
+  object: **G**, **S** and **Tab** work as usual. **V** slides it along the
+  walls, snapping flush to the one under the cursor (hold **Ctrl** to also
+  snap to a grid on the wall),
+  **Tab** edits its panes (loop cut, slide edges), **Divide Window** splits
+  it quickly. It cuts every wall object it lies on and draws its own frame,
+  mullions and glass. No size fields: the window is just a sheet of faces.
 - **Per-face thickness.** Give selected faces their own thickness, for
   example a thicker exterior wall.
 - **Click-to-paint surfaces.**
@@ -91,8 +99,8 @@ modifier shows it on your object. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.m
 
 ## Roadmap
 
-- [ ] Door and window components that cut openings and follow the wall
-      (`core.anchors` is the placement foundation)
+- [x] Windows that cut openings and slide along the wall (doors next)
+      (`core.windows` builds on the same engine)
 - [ ] Trims: baseboards, crown moulding, window frames
 - [ ] Material + colour painting (tint any material with a chosen colour)
 - [ ] Paint presets and a shared paint library

@@ -12,10 +12,11 @@ back to being a plain mesh, just like any other modifier.
 """
 
 import bpy
+from mathutils import Vector
 from bpy.app.handlers import persistent
 
 from .. import core
-from . import display, source_io
+from . import display, source_io, window_io
 from .constants import OUT_SOURCE_FACE, OUT_SURFACE, OUT_UID, OUT_UV_MAP
 
 _signatures = {}   # source session_uid -> signature of the last build
@@ -110,7 +111,7 @@ def write_shell(mesh, shell, materials):
     mesh.update()
 
 
-def _signature(sheet, settings, materials):
+def _signature(sheet, settings, materials, windows=()):
     q = 1e-6
     return hash((
         tuple(round(c / q) for p in sheet.positions for c in p),
@@ -121,6 +122,7 @@ def _signature(sheet, settings, materials):
         tuple(sheet.face_uids),
         round(settings.thickness / q), round(settings.offset / q), round(settings.miter_limit / q),
         tuple(m.session_uid if m else 0 for m in materials),
+        window_io.signature(windows),
     ))
 
 
@@ -146,7 +148,8 @@ def rebuild(obj, force=False):
         materials = _source_materials(obj)
 
         key = obj.session_uid
-        sig = _signature(sheet, settings, materials)
+        windows = window_io.read_openings(obj)
+        sig = _signature(sheet, settings, materials, windows)
         shell = obj.aa_assembly.shell
         if (not force and _signatures.get(key) == sig and shell is not None
                 and display.shell_linked(mod, shell) and not _shell_taken(obj, shell)):
@@ -154,7 +157,60 @@ def rebuild(obj, force=False):
 
         shell = ensure_shell(obj)
         display.link_shell(mod, shell)
-        write_shell(shell.data, core.build_shell(sheet, settings), materials)
+        write_shell(shell.data, core.build_assembly(sheet, settings, windows), materials)
+        _signatures[key] = sig
+        return True
+    finally:
+        _busy = False
+
+
+def _window_shell_object(win):
+    data = win.aa_window
+    shell = data.shell
+    if shell is not None:
+        users = [o for o in window_io.all_windows() if o.aa_window.shell == shell]
+        owner = next((o for o in users if o.name == shell.aa_assembly.owner_name), None)
+        owner = owner or min(users, key=lambda o: o.name, default=win)
+        if shell.type != "MESH" or (len(users) > 1 and owner != win):
+            shell = None   # A copy of a window (Shift+D) gets a shell of its own.
+    if shell is None:
+        name = f"{win.name}.shell"
+        shell = bpy.data.objects.new(name, bpy.data.meshes.new(name))
+        data.shell = shell
+    if shell.aa_assembly.owner_name != win.name:
+        shell.aa_assembly.owner_name = win.name
+    return shell
+
+
+def rebuild_window(win, force=False):
+    """Regenerate a window's own frame and glass if its panes, size or settings changed."""
+    global _busy
+    if _busy or not window_io.is_window(win):
+        return False
+    mod = display.find_window_modifier(win)
+    if mod is None:
+        return False   # The modifier was removed or applied: the window is just its sheet.
+    _busy = True
+    try:
+        spec = window_io.read_spec(win)
+        materials = _source_materials(win)
+        inverse = win.matrix_world.inverted_safe()
+        q = 1e-6
+        sig = hash((window_io.signature([spec]),
+                    tuple(round(c / q) for row in win.matrix_world for c in row),
+                    tuple(m.session_uid if m else 0 for m in materials)))
+        key = win.session_uid
+        shell = win.aa_window.shell
+        if (not force and _signatures.get(key) == sig and shell is not None
+                and display.shell_linked(mod, shell)):
+            return False
+        shell = _window_shell_object(win)
+        display.link_shell(mod, shell)
+        # Generated in world metres, stored in the window's local space: bar widths stay
+        # true when the window object is scaled.
+        result = core.build_window_shell(spec) or core.ShellMesh()
+        result.vertices = [tuple(inverse @ Vector(v)) for v in result.vertices]
+        write_shell(shell.data, result, materials)
         _signatures[key] = sig
         return True
     finally:
@@ -165,6 +221,8 @@ def rebuild_all(force=False):
     for obj in bpy.data.objects:
         if is_assembly(obj):
             rebuild(obj, force=force)
+        elif window_io.is_window(obj):
+            rebuild_window(obj, force=force)
 
 
 # -- handlers ----------------------------------------------------------------
@@ -179,6 +237,8 @@ def aa_on_depsgraph_update(scene, depsgraph):
     for obj in scene.objects:
         if is_assembly(obj):
             rebuild(obj)
+        elif window_io.is_window(obj):
+            rebuild_window(obj)
 
 
 @persistent

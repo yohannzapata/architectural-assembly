@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 import bpy
 
-from . import display, sync
+from . import display, sync, window_io
 from .constants import IN_MITER, IN_OFFSET, IN_THICKNESS
 
 
@@ -12,6 +12,10 @@ class AA_PT_assembly(bpy.types.Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "Assembly"
+
+    @classmethod
+    def poll(cls, context):
+        return not window_io.is_window(context.active_object)
 
     def draw(self, context):
         layout = self.layout
@@ -60,7 +64,40 @@ class AA_PT_assembly_faces(bpy.types.Panel):
         col.operator("architectural_assembly.clear_face_paint", icon="BRUSH_DATA")
 
 
-classes = (AA_PT_assembly, AA_PT_assembly_faces)
+class AA_PT_windows(bpy.types.Panel):
+    bl_label = "Windows"
+    bl_idname = "AA_PT_windows"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "Assembly"
+
+    @classmethod
+    def poll(cls, context):
+        obj = context.active_object
+        return context.mode == "OBJECT" and (sync.is_assembly(obj) or window_io.is_window(obj))
+
+    def draw(self, context):
+        layout = self.layout
+        obj = context.active_object
+        layout.operator("architectural_assembly.add_window", icon="MOD_LATTICE")
+        if not window_io.is_window(obj):
+            layout.label(text="Click a wall to drop a window. Click a window to edit it")
+            return
+        row = layout.row(align=True)
+        row.operator("architectural_assembly.move_window", icon="CON_LOCLIKE")
+        row.operator("architectural_assembly.divide_window", icon="GRID")
+        layout.label(text="V slide on walls (Ctrl: grid)  •  S resize  •  Tab panes")
+        data = obj.aa_window
+        layout.use_property_split = True
+        layout.use_property_decorate = False
+        col = layout.column(align=True)
+        col.prop(data, "frame_width")
+        col.prop(data, "mullion_width")
+        col.prop(data, "frame_depth")
+        col.prop(data, "glass_thickness")
+
+
+classes = (AA_PT_assembly, AA_PT_assembly_faces, AA_PT_windows)
 
 
 def register():

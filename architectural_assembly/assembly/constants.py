@@ -29,3 +29,7 @@ IN_SHELL = "Shell"
 IN_THICKNESS = "Thickness"
 IN_OFFSET = "Offset"
 IN_MITER = "Miter Limit"
+
+# Window display modifier (a window draws its own frame and glass).
+WINDOW_NODE_GROUP = "Architectural Window"
+WINDOW_MODIFIER = "Architectural Window"
