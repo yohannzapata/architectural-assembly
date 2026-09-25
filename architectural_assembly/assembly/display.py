@@ -14,7 +14,16 @@ Applying the modifier bakes the shell into the object.
 
 import bpy
 
-from .constants import IN_MITER, IN_OFFSET, IN_SHELL, IN_THICKNESS, MODIFIER, NODE_GROUP
+from .constants import (
+    IN_MITER,
+    IN_OFFSET,
+    IN_SHELL,
+    IN_THICKNESS,
+    MODIFIER,
+    NODE_GROUP,
+    WINDOW_MODIFIER,
+    WINDOW_NODE_GROUP,
+)
 
 # (name, socket type, default, min, max, subtype, description)
 _INPUTS = (
@@ -161,3 +170,53 @@ def link_shell(mod, shell):
 def shell_linked(mod, shell):
     sock = _find_socket(mod.node_group, IN_SHELL)
     return sock is not None and _input_get(mod, sock.identifier) == shell
+
+
+# -- window modifier ---------------------------------------------------------
+
+def ensure_window_node_group():
+    """Node group that shows a window's generated frame and glass (Object Info of its shell)."""
+    group = bpy.data.node_groups.get(WINDOW_NODE_GROUP)
+    if group is not None and group.get("aa_version") == _VERSION:
+        return group
+    if group is None:
+        group = bpy.data.node_groups.new(WINDOW_NODE_GROUP, "GeometryNodeTree")
+    group.interface.clear()
+    group.nodes.clear()
+    if hasattr(group, "is_modifier"):
+        group.is_modifier = True
+    group.description = "Frame, mullions and glass of a window (Architectural Assembly add-on)"
+    iface = group.interface
+    iface.new_socket("Geometry", in_out="INPUT", socket_type="NodeSocketGeometry")
+    shell = iface.new_socket(IN_SHELL, in_out="INPUT", socket_type="NodeSocketObject")
+    shell.description = "Generated geometry (managed automatically)"
+    iface.new_socket("Geometry", in_out="OUTPUT", socket_type="NodeSocketGeometry")
+
+    nodes, links = group.nodes, group.links
+    g_in = nodes.new("NodeGroupInput")
+    g_in.location = (-400, 0)
+    info = nodes.new("GeometryNodeObjectInfo")
+    info.transform_space = "ORIGINAL"
+    info.location = (-150, 0)
+    links.new(g_in.outputs[IN_SHELL], info.inputs["Object"])
+    g_out = nodes.new("NodeGroupOutput")
+    g_out.location = (150, 0)
+    links.new(info.outputs["Geometry"], g_out.inputs["Geometry"])
+    group["aa_version"] = _VERSION
+    return group
+
+
+def find_window_modifier(obj):
+    for mod in obj.modifiers:
+        if (mod.type == "NODES" and mod.node_group is not None
+                and mod.node_group.name == WINDOW_NODE_GROUP):
+            return mod
+    return None
+
+
+def add_window_modifier(obj):
+    mod = obj.modifiers.new(WINDOW_MODIFIER, "NODES")
+    mod.node_group = ensure_window_node_group()
+    mod.show_in_editmode = True
+    mod.show_on_cage = False
+    return mod

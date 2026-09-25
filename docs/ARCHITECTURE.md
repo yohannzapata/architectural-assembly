@@ -117,3 +117,36 @@ stop the fill, so painting inside a room never reaches the outside.
   noticeably slower than native modifiers.
 - Flipping a face's normal swaps its Front and Back, including their paint.
 - Painting works in Object Mode only.
+
+## Windows
+
+A window is a mesh object whose faces are its panes (`Object.aa_window`).
+It draws itself: like a wall, it has a Geometry Nodes modifier
+(*Architectural Window*) that shows a hidden shell object, so it can be
+clicked, edited and transformed like any object and has its own materials
+(slot 0 frame, slot 1 glass).
+
+`core.windows` does, in world space:
+
+1. **Cut.** `build_assembly()` subtracts each window's outline (the convex hull
+   of its panes) from every wall face parallel to it and within one
+   thickness of it. This applies to *every* assembly object, so a window can
+   span or move between separate walls. The convex hole is removed one edge
+   at a time, which leaves convex pieces that inherit the parent's
+   thickness, material, paint and uid. `face_source` is mapped back to the
+   original face, so painting treats the pieces as one face.
+2. **Frame and glass.** `build_window_shell()`: every pane edge with no pane
+   on the other side is inset by the frame width, edges shared with another
+   pane by half the mullion width (both sides together make one bar). The
+   strips between each pane and its inset outline form a sheet thickened by
+   the frame depth. The inset outlines, grown by a small rebate, form a thin
+   glass sheet. A pane too small for its bars becomes solid frame.
+
+The result is generated in world metres and stored in the window's local
+space, so bar widths stay true when the window object is scaled.
+`sync.rebuild_window()` does that; walls read all windows into their signature.
+
+Limits: panes must be convex (skewed quads, trapezoids and triangles are
+fine), wall faces must be convex, the wall opening follows the convex hull of
+all panes, and a window only cuts walls parallel to it (within about 2.5
+degrees).
